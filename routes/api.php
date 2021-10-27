@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/admin/getusers', [UserController::class, 'getUsers']);
+Route::post('/admin/saveuser', [UserController::class, 'store']);
+Route::delete('/admin/deleteuser/{userid}', [UserController::class, 'destroy']);
+Route::get('/admin/geteditableuser/{userid}', [UserController::class, 'show']);
+Route::put('/admin/updateuser/{userid}', [UserController::class, 'update']);
+Route::get('/admin/searchusers/{searchparameter}/{searchword}', [UserController::class, 'search']);
+

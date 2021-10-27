@@ -1,6 +1,6 @@
 import Index from './components/admin/Index';
 import CreateUser from './components/admin/CreateUser';
-import editUser from './components/admin/editUser';
+import EditUser from './components/admin/EditUser';
 export const routes = [
     {
         path: '/admin',
@@ -14,7 +14,7 @@ export const routes = [
     },
     {
         path: '/admin/edit/:id',
-        name: 'editUser',
-        component: editUser
+        name: 'EditUser',
+        component: EditUser
     },
 ];

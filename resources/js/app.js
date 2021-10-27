@@ -4,6 +4,7 @@ window.Vue = require('vue').default;
 import Vue from "vue";
 import VueRouter from "vue-router";
 import { routes } from "./routes";
+import Toasted from 'vue-toasted';
 
 Vue.use(VueRouter);
 
@@ -17,4 +18,9 @@ const router = new VueRouter({
 const app = new Vue({
     el: '#app',
     router: router
+});
+
+Vue.use(Toasted,{
+    position: 'bottom-right',
+    duration: 5000,
 });

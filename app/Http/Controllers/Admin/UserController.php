@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\User;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+Use Log;
 
 class UserController extends Controller
 {
@@ -36,7 +38,16 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $users = User::get();
+        $newUser = User::create([
+            'name' => $request->input('name', ''),
+            'email' => $request->input('email', ''),
+            'phone' => $request->input('phone', ''),
+            'dob' => $request->input('dob', ''),
+            'type' => $request->input('type', ''),
+            'password' => Hash::make($request->input('password', ''))
+        ]);
+
+        return response()->json($newUser);
     }
 
     /**
@@ -47,7 +58,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        return User::where('id', $id)->first();
     }
 
     /**
@@ -70,7 +81,18 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $value = [];
+        $value['id'] = $id;
+        $value['name'] = $request->name;
+        $value['email'] = $request->email;
+        $value['phone'] = $request->phone;
+        $value['dob'] = $request->dob;
+        $value['type'] = $request->type;
+        $value['password'] = Hash::make($request->password);
+
+        $updateUser = User::updateOrCreate(['id'=> $id], $value);
+
+        return response()->json($updateUser);
     }
 
     /**
@@ -81,6 +103,39 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $response = User::find($id)->delete();
+        if ($response){
+            $data=[
+            'status'=>'1',
+            'msg'=>'ユーザーレコードが正常に削除されました'
+            ];
+        }else{
+            $data=[
+            'status'=>'0',
+            'msg'=>'ユーザーを削除できませんでした'
+            ];
+        }
+        return response()->json($data);
+    }
+
+    public function getUsers() {
+        $users = User::get();
+        return response()->json($users);
+    }
+
+    public function search($searchparameter, $searchWord) {
+        switch($searchparameter) {
+            case 'ユーザー名' :
+                $result = User::where('name', "LIKE", "%{$searchWord}%")->get();
+                break;
+            case 'メール' :
+                $result = User::where('email', "LIKE", "%{$searchWord}%")->get();
+                break;
+            case '電話番号' :
+                $result = User::where('phone', "LIKE", "%{$searchWord}%")->get();
+                break;
+        }
+
+        return $result;
     }
 }

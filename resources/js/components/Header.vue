@@ -14,16 +14,21 @@ export default {
 <style >
 .page-title {
     color: #000;
-    padding-left: 5rem;
-    font-size: 30px;
+    font-size: 25px;
 }
 .container-fluid {
-    margin-left: 20rem;
+    margin-left: 10rem;
 }
 .app {
     width: -webkit-fill-available;
 }
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   font-size: 10px;
+}
+.card {
+    min-width: max-content;
+}
+.error-text {
+    color: red;
 }
 </style>

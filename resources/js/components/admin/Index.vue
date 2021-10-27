@@ -1,37 +1,57 @@
 <template>
 <div class="container">
-    <div class="align-items-center justify-content-between mb-4">
-        <h1 class="page-title">ユーザー一覧</h1>
-    </div>
-
     <div class="row">
         <div class="card mx-auto">
-            <div>
-                <div class="alert alert-success">
-                </div>
-            </div>
-
-
             <div class="card-header">
+                <div class="align-items-center d-flex justify-content-between mb-4">
+                    <strong class="page-title">ユーザー一覧</strong>
+                </div>
+
                 <div class="row">
                     <div class="col-12">
                         <form >
-                            <div class="form-row">
-                                <div class="col-10">
-                                    <input type="search" name="search" class="form-control mb-2" id="inlineFormInput" placeholder="ユーザー名, 電話番号, メール">
+                            <div class="form-row d-flex justify-content-between">
+                                <div class="col-6">
+                                    <input 
+                                        type="search" 
+                                        name="searchWrd" 
+                                        class="form-control mb-2" 
+                                        id="inlineFormInput" 
+                                        v-model="searchWord"
+                                        placeholder="ユーザー名, 電話番号, メール"
+                                    >
                                 </div>
 
-                                <div class="col-2 align-items-right">
-                                    <button type="submit" class="btn btn-primary mb-2">検索</button> 
-                                </div>                           
-                            </div>
+                                <div class="col-2 align-items-righ">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-primary mb-2"
+                                        @click="searchResult()"
+                                    >検索
+                                    </button> 
+                                </div>  
+
+                                <div class="col">
+                                    <select
+                                        class="form-control" 
+                                        name="searchParameter" 
+                                        v-model="selectedSearchParameter"
+                                    >
+                                        <option v-for="searchType in searchParameters" :key="searchType" :value="searchType">
+                                            {{ searchType }} </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-4 align-items-right">
+                                    <router-link :to="{ path: '/admin/createuser'}" class="create-user-button btn btn-success mb-2">ユーザー作成</router-link>
+                                </div>                          
+                            </div> 
                         </form>
                     </div>
 
-                    <div class="col-12">
-                        <router-link :to="{ path: '/admin/createuser'}" class="btn btn-primary mb-2">ユーザー作成</router-link>
-                    </div>  
+                    
                 </div>
+
             </div>
 
             <div class="card-body">
@@ -41,17 +61,21 @@
                             <th>ユーザー名</th>
                             <th>メール</th>
                             <th>電話番号</th>
+                            <th>ユーザータイプ</th>
                         </tr>
                     </thead>
 
-                    <tbody>
-                        <tr>
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                    <tbody v-for="user in users" :key="user.id">
+                        <tr >
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>{{ user.type }}</td>
                             <td>
-                                <!-- <router-link :to="{ name: }" class="btn btn-primary mb-2">変化</router-link> -->
+                                <router-link :to="{ name: 'EditUser', params: {id: user.id}}" class="btn btn-primary mb-2">変化</router-link>
+                            </td>
+                            <td>
+                                <button @click="deleteUser(user)" class="btn btn-warning mb-2">削除</button>
                             </td>
                         </tr>
                     </tbody>
@@ -67,6 +91,49 @@
 
 export default {
     name: 'UserList',
+    data() {
+        return {
+            users: [],
+            selectedSearchParameter : '',
+            searchParameters : ['ユーザー名', 'メール', '電話番号'],
+            searchWord: '',
+        }
+    },
+
+    created() {
+        this.getUsers();
+
+    },
+    methods: {
+        getUsers() {
+            axios.get('/api/admin/getusers')
+                .then(response => {
+                    this.users = response.data;
+                }).catch(error => {
+                   Vue.toasted.error('入力にエラーがあります');
+                });
+        },
+        deleteUser(user) {
+            axios.delete('/api/admin/deleteuser/' + user.id)
+                .then(response => {
+                    Vue.toasted.success('ユーザーレコードが正常に削除されました');
+                    this.getUsers();
+
+                }).catch
+                (error => {
+                    Vue.toasted.error('エラーが発生しました');
+                });
+        },
+        searchResult() {
+            axios.get('/api/admin/searchusers/' + this.selectedSearchParameter + '/' + this.searchWord)
+                .then(response => {
+                    this.users = response.data;
+                }).catch(error => {
+                   Vue.toasted.error('入力にエラーがあります');
+                });
+        }
+
+    }
 }
 </script>
 
