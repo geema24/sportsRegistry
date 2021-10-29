@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-Use Log;
+use Log;
 
 class UserController extends Controller
 {
@@ -43,7 +43,7 @@ class UserController extends Controller
             'email' => $request->input('email', ''),
             'phone' => $request->input('phone', ''),
             'dob' => $request->input('dob', ''),
-            'type' => $request->input('type', ''),
+            'type' => $request->input('userType', ''),
             'password' => Hash::make($request->input('password', ''))
         ]);
 
@@ -90,7 +90,7 @@ class UserController extends Controller
         $value['type'] = $request->type;
         $value['password'] = Hash::make($request->password);
 
-        $updateUser = User::updateOrCreate(['id'=> $id], $value);
+        $updateUser = User::updateOrCreate(['id' => $id], $value);
 
         return response()->json($updateUser);
     }
@@ -101,37 +101,47 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $response = User::find($id)->delete();
-        if ($response){
-            $data=[
-            'status'=>'1',
-            'msg'=>'ユーザーレコードが正常に削除されました'
+        if ($request->authUserId == $id) {
+            $data = [
+                'status' => '0',
+                'msg' => "自分を削除することはできません"
             ];
-        }else{
-            $data=[
-            'status'=>'0',
-            'msg'=>'ユーザーを削除できませんでした'
+            return response()->json($data);
+        }
+
+        $response = User::find($id)->delete();
+        if ($response) {
+            $data = [
+                'status' => '1',
+                'msg' => 'ユーザーレコードが正常に削除されました'
+            ];
+        } else {
+            $data = [
+                'status' => '0',
+                'msg' => 'ユーザーを削除できませんでした'
             ];
         }
         return response()->json($data);
     }
 
-    public function getUsers() {
+    public function getUsers()
+    {
         $users = User::get();
         return response()->json($users);
     }
 
-    public function search($searchparameter, $searchWord) {
-        switch($searchparameter) {
-            case 'ユーザー名' :
+    public function search($searchparameter, $searchWord)
+    {
+        switch ($searchparameter) {
+            case 'ユーザー名':
                 $result = User::where('name', "LIKE", "%{$searchWord}%")->get();
                 break;
-            case 'メール' :
+            case 'メール':
                 $result = User::where('email', "LIKE", "%{$searchWord}%")->get();
                 break;
-            case '電話番号' :
+            case '電話番号':
                 $result = User::where('phone', "LIKE", "%{$searchWord}%")->get();
                 break;
         }

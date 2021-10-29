@@ -164,7 +164,7 @@
 export default {
     data() {
         return {
-            userTypeList    : ['管理者', 'ゲスト'],
+            userTypeList    : ['管理者', '登録ユーザー', 'ゲスト'],
             form: {
                 userType : 'ゲスト', 
                 name: "",

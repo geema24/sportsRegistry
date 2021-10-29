@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user_id" content="{{ Auth::user()->id }}">
 
     <title>ダッシュボード</title>
 
@@ -45,29 +47,13 @@
                 </a>
             </li>
 
-            <!-- Nav Item - Pages Collapse Menu -->
-            <!-- <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>ユーザー管理</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">ユーザーメニュー:</h6>
-                        <a class="collapse-item" href="buttons.html">ユーザー登録</a>
-                        <a class="collapse-item" href="cards.html"></a>
-                    </div>
-                </div>
-            </li> -->
-
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             <li class="nav-item active">
-                <a class="nav-link" href="index.html">
+                <a class="nav-link" href="/sports">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>チーム管理</span>
+                    <span>スポーツ管理</span>
                 </a>
             </li>
 
@@ -95,10 +81,11 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
+                    <strong>スポーツ登録制度</strong>
+
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
-
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"

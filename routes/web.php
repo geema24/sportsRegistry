@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 
 Auth::routes();
 
@@ -24,3 +22,11 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('/admin', function() {
     return view('admin.index');
 });
+
+Route::get('/sports', function() {
+    return view('admin.index');
+});
+
+Route::get('/{any}', function () {
+    return view('admin.index');
+})->where('any', '.*');

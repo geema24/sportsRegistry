@@ -4,9 +4,10 @@
       <div class="card mx-auto">
         <div class="card-header">
           <div class="align-items-center d-flex justify-content-between mb-4">
-            <strong class="page-title">ユーザー一覧</strong>
+            <p>
+              <strong class="page-title">チームメンバー一覧</strong>
+            </p>
           </div>
-
           <div class="row">
             <div class="col-12">
               <form>
@@ -18,7 +19,7 @@
                       class="form-control mb-2"
                       id="inlineFormInput"
                       v-model="searchWord"
-                      placeholder="ユーザー名, 電話番号, メール"
+                      placeholder="プレイヤー名, プレイヤー番号, 年"
                     />
                   </div>
 
@@ -46,9 +47,9 @@
 
                   <div class="col-4 align-items-right">
                     <router-link
-                      :to="{ path: '/admin/createuser' }"
+                      :to="{ path: '/sports/team/add/member/' + teamId }"
                       class="create-user-button btn btn-success mb-2"
-                      >ユーザー作成</router-link
+                      >プレーヤー追加</router-link
                     >
                   </div>
                 </div>
@@ -61,32 +62,38 @@
           <table class="table">
             <thead>
               <tr>
-                <th>ユーザー名</th>
-                <th>メール</th>
-                <th>電話番号</th>
-                <th>ユーザータイプ</th>
+                <th>プレイヤーID</th>
+                <th>プレイヤー名</th>
+                <th>位置</th>
+                <th>プレイヤー番号</th>
+                <th>年</th>
               </tr>
             </thead>
 
-            <tbody v-for="user in users" :key="user.id">
+            <tbody v-for="member in members" :key="member.id">
               <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.phone }}</td>
-                <td>{{ user.type }}</td>
+                <td>{{ member.id }}</td>
+                <td>{{ member.name }}</td>
+                <td>{{ member.position }}</td>
+                <td>{{ member.player_number }}</td>
+                <td>{{ member.age }}</td>
                 <td>
                   <router-link
-                    :to="{ name: 'EditUser', params: { id: user.id } }"
+                    :to="{ path: '/sports/team/edit/member/' + member.id }"
                     class="btn btn-primary mb-2"
-                    >変化</router-link
+                    >更新</router-link
                   >
                 </td>
                 <td>
-                  <button @click="deleteUser(user)" class="btn btn-warning mb-2">削除</button>
+                  <button @click="deleteUser(member)" class="btn btn-warning mb-2">消去</button>
                 </td>
               </tr>
             </tbody>
           </table>
+
+          <div class=" download-button">
+            <button @click="downloadTeamData()" class="btn btn-success mb-2">ダウンロード</button>
+          </div>
         </div>
       </div>
     </div>
@@ -95,44 +102,39 @@
 
 <script>
 export default {
-  name: 'UserList',
+  name: 'TeamList',
   data() {
     return {
-      users: [],
+      teamName: '',
+      members: [],
       selectedSearchParameter: '',
-      searchParameters: ['ユーザー名', 'メール', '電話番号'],
+      searchParameters: ['プレイヤー名', 'プレイヤー番号', '年'],
       searchWord: '',
-      authUserId: '',
+      teamId: '',
     };
   },
 
   created() {
-    this.getUsers();
-    this.initial();
+    this.getMembers();
   },
   methods: {
-    initial() {
-      this.authUserId = parseInt(
-        document.querySelector("meta[name='user_id']").getAttribute('content'),
-        10,
-      );
-    },
-    getUsers() {
+    getMembers() {
+      this.teamId = window.location.href.split('/').pop();
       axios
-        .get('/api/admin/getusers')
+        .get('/api/admin/getMembers/' + this.teamId)
         .then(response => {
-          this.users = response.data;
+          this.members = response.data;
         })
         .catch(error => {
-          Vue.toasted.error('入力にエラーがあります');
+          Vue.toasted.error('エラーが発生しました');
         });
     },
-    deleteUser(user) {
+    deleteUser(member) {
       axios
-        .delete('/api/admin/deleteuser/' + user.id, { data: { authUserId: this.authUserId } })
+        .delete('/api/admin/deleteMember/' + member.id)
         .then(response => {
-          Vue.toasted.success(response.data.msg);
-          this.getUsers();
+          Vue.toasted.success('ユーザーレコードが正常に削除されました');
+          this.getMembers();
         })
         .catch(error => {
           Vue.toasted.error('エラーが発生しました');
@@ -140,9 +142,9 @@ export default {
     },
     searchResult() {
       axios
-        .get('/api/admin/searchusers/' + this.selectedSearchParameter + '/' + this.searchWord)
+        .get('/api/admin/searchMembers/' + this.selectedSearchParameter + '/' + this.searchWord)
         .then(response => {
-          this.users = response.data;
+          this.members = response.data;
         })
         .catch(error => {
           Vue.toasted.error('入力にエラーがあります');
@@ -156,5 +158,9 @@ export default {
 .user-list-container {
   align-content: center;
   align-items: center;
+}
+.download-button {
+  display: flex;
+  flex-direction: column;
 }
 </style>
